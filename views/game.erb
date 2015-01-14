@@ -1,0 +1,35 @@
+<h1>Blackjack!</h1>
+
+
+<h4>Hi <%= session[:player_name] %> !</h4>
+
+Dealer's cards:
+<ul>
+  <% if !@dealer_turn %>
+    <li>?????</li>
+    <li><%= session[:dealer_hand][1] %></li>
+  <% else %>
+    <% session[:dealer_hand].each do |card| %>
+      <li><%= card %></li>
+    <% end %>
+  <% end %>
+</ul> 
+
+<br/>
+Player's cards:
+<ul>
+  <% session[:player_hand].each do |card| %>
+    <li><%= card %></li>
+  <% end %>
+</ul> 
+<%= session[:player_name] %> has <%= calculate_value(session[:player_hand]) %> points.
+
+<% if @show_hit_or_stay_buttons %>
+<form action='/hit' method='post'>
+  <button type='submit' class='btn'>Hit</button>
+</form>
+
+<form action='/stay' method='post'>
+  <button type='submit' class='btn'>Stay</button>
+</form>
+<% end %>
