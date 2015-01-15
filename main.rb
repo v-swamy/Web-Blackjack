@@ -8,15 +8,18 @@ use Rack::Session::Cookie, :key => 'rack.session',
 
 
 helpers do
-  def make_game_deck
-    card_numbers = ['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+  CARD_NUMBERS = ['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
                 'Jack', 'Queen', 'King', 'Ace']
-    card_suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+  CARD_SUITS = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+  
+  CARD_VALUES = {'Two' => 2, 'Three' => 3, 'Four' => 4, 'Five' => 5, 'Six' => 6, 'Seven' => 7, 
+      'Eight' => 8, 'Nine' => 9, 'Ten' => 10, 'Jack' => 10, 'Queen' => 10, 'King' => 10,
+      'Ace' => 1}
 
-
+  def make_game_deck
     session[:deck] = []
-    card_suits.each do |suit|
-      card_numbers.each do |number|
+    CARD_SUITS.each do |suit|
+      CARD_NUMBERS.each do |number|
         session[:deck] << number + " of " + suit
       end
     end
@@ -24,12 +27,9 @@ helpers do
   end
 
   def calculate_value(hand)
-    card_values = {'Two' => 2, 'Three' => 3, 'Four' => 4, 'Five' => 5, 'Six' => 6, 'Seven' => 7, 
-      'Eight' => 8, 'Nine' => 9, 'Ten' => 10, 'Jack' => 10, 'Queen' => 10, 'King' => 10,
-      'Ace' => 1}
     value = 0
     hand.each do |card|
-      value += card_values[card.split[0]]
+      value += CARD_VALUES[card.split[0]]
     end
     number_of_aces = 0
     number_of_aces = hand.select {|card| card.split[0] == 'Ace'}.length
@@ -39,6 +39,18 @@ helpers do
     end
     value
   end
+
+  def card_image(card)
+    suit = card.split[2].downcase
+    value = CARD_VALUES[card.split[0]].to_s
+
+    if ['Jack', 'Queen', 'King', 'Ace'].include?card.split[0]
+      value = card.split[0].downcase
+    end
+
+    file = suit + '_' + value
+    "<img src='/images/cards/#{file}.jpg' class='card_image'>"
+  end 
 end
 
 before do
@@ -48,11 +60,7 @@ end
 
 
 get '/' do
-  if session[:player_name]
-    redirect '/game'
-  else 
-    redirect '/new_player'
-  end
+  redirect '/new_player'
 end
 
 get '/new_player' do
@@ -75,7 +83,6 @@ post '/save_bet' do
 end
 
 
-
 get '/game' do
   make_game_deck
   session[:player_hand] = []
@@ -84,11 +91,11 @@ get '/game' do
   session[:dealer_hand] << session[:deck].pop
   session[:player_hand] << session[:deck].pop
   session[:dealer_hand] << session[:deck].pop
-
   erb :game
 end
   
 post '/hit' do
+  binding.pry
   session[:player_hand] << session[:deck].pop
   if calculate_value(session[:player_hand]) > 21
     session[:cash] -= session[:bet]
@@ -99,6 +106,7 @@ post '/hit' do
 end
 
 post '/stay' do
+  binding.pry
   @success = "You have chosen to stay."
   @show_hit_or_stay_buttons = false
   erb :game

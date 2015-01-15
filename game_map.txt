@@ -1,0 +1,34 @@
+'/' can redirect to '/new_game'
+
+/new_game
+- welcome to blackjack!
+- create a form to ask for name
+- post to save name to sessions
+- redirect to /take_bet
+
+/take_bet
+- tell opening amount
+- create a form to take bet
+- post to save amount
+- redirect to /game
+
+/game
+- create deck and save to sessions
+- deal cards, save hands
+- show dealer cards with 1 card flipped
+- show player cards and total value
+- ask for hit or stay with buttons
+- hit posts to /hit
+- stay pots to /stay
+
+/hit
+- adds another card to player hand
+- recalculates value
+- redirect to /game
+
+/
+
+
+
+
+

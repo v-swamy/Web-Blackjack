@@ -1,35 +1,34 @@
 <h1>Blackjack!</h1>
 
-
-<h4>Hi <%= session[:player_name] %> !</h4>
-
-Dealer's cards:
-<ul>
+<div class='well'>
+  <h4>Dealer's cards:</h4>
   <% if !@dealer_turn %>
-    <li>?????</li>
-    <li><%= session[:dealer_hand][1] %></li>
+    <img src="images/cards/cover.jpg" class='card_image'>
+    <%= card_image(session[:dealer_hand][1]) %>
   <% else %>
     <% session[:dealer_hand].each do |card| %>
-      <li><%= card %></li>
+      <%= card_image(card) %>
     <% end %>
   <% end %>
-</ul> 
+</div>
 
 <br/>
-Player's cards:
-<ul>
-  <% session[:player_hand].each do |card| %>
-    <li><%= card %></li>
-  <% end %>
-</ul> 
-<%= session[:player_name] %> has <%= calculate_value(session[:player_hand]) %> points.
+
+<div class='well'>
+<h4>Player's cards:</h4>
+    <% session[:player_hand].each do |card| %>
+      <%= card_image(card) %>
+    <% end %>
+</div>
+
+<p><%= session[:player_name] %> has <%= calculate_value(session[:player_hand]) %> points.</p>
+
 
 <% if @show_hit_or_stay_buttons %>
-<form action='/hit' method='post'>
-  <button type='submit' class='btn'>Hit</button>
-</form>
-
-<form action='/stay' method='post'>
-  <button type='submit' class='btn'>Stay</button>
-</form>
+  <form  action="/hit" method="post" id="hit">
+    <button type='button' class='btn btn-success'>Hit</button>
+  </form>
+  <form  action="/stay" method="post" id="stay">
+    <button type='button' class='btn btn-warning'>Stay</button>
+  </form>
 <% end %>
