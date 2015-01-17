@@ -29,10 +29,10 @@ helpers do
   def calculate_value(hand)
     value = 0
     hand.each do |card|
-      value += CARD_VALUES[card.split[0]]
+      value += CARD_VALUES[card.split.first]
     end
     number_of_aces = 0
-    number_of_aces = hand.select {|card| card.split[0] == 'Ace'}.length
+    number_of_aces = hand.select {|card| card.split.first == 'Ace'}.length
     while number_of_aces > 0 && value > 21
       value -= 10
       number_of_aces -= 1
@@ -41,22 +41,22 @@ helpers do
   end
 
   def card_image(card)
-    suit = card.split[2].downcase
-    value = CARD_VALUES[card.split[0]].to_s
-    if ['Jack', 'Queen', 'King', 'Ace'].include?card.split[0]
-      value = card.split[0].downcase
+    suit = card.split.last.downcase
+    value = CARD_VALUES[card.split.first.to_s]
+    if ['Jack', 'Queen', 'King', 'Ace'].include?(card.split.first)
+      value = card.split.first.downcase
     end
     file = suit + '_' + value
     "<img src='/images/cards/#{file}.jpg' class='card_image'>"
   end 
 
-  def dealer_turn_toggle
+  def dealer_turn_toggle!
     @show_hit_or_stay_buttons = false
     @dealer_turn = true
     @show_dealer_hit_button = true
   end
 
-  def game_over_button_toggle
+  def game_over_button_toggle!
     @show_hit_or_stay_buttons = false
     @dealer_turn = true
     @show_play_again_buttons = true
@@ -123,11 +123,11 @@ get '/game' do
   if calculate_value(session[:player_hand]) == 21
     session[:cash] += session[:bet]
     @success = "#{session[:player_name]} got a blackjack! #{session[:player_name]} wins! You now have $#{session[:cash]}."
-    game_over_button_toggle
+    game_over_button_toggle!
   elsif calculate_value(session[:dealer_hand]) == 21
     session[:cash] -= session[:bet]
     @error = "Dealer got a blackjack!  #{session[:player_name]} loses. You now have $#{session[:cash]}."
-    game_over_button_toggle
+    game_over_button_toggle!
   end
   erb :game
 end
@@ -137,7 +137,7 @@ post '/player/hit' do
   if calculate_value(session[:player_hand]) > 21
     session[:cash] -= session[:bet]
     @error = "#{session[:player_name]} busted! You now have $#{session[:cash]}."
-    game_over_button_toggle
+    game_over_button_toggle!
     if session[:cash] == 0
       @error = "#{session[:player_name]} busted and is out of cash! Click <a href='/'>Start Over</a> to play again."
       @show_play_again_buttons = false
@@ -147,7 +147,7 @@ post '/player/hit' do
 end
 
 post '/dealer' do
-  dealer_turn_toggle
+  dealer_turn_toggle!
   if calculate_value(session[:dealer_hand]) > 17
     redirect '/game/compare'
   end
@@ -155,7 +155,7 @@ post '/dealer' do
 end
 
 get '/game/compare' do
-  game_over_button_toggle
+  game_over_button_toggle!
   if calculate_value(session[:dealer_hand]) > 21
     session[:cash] += session[:bet]
     @success = "Dealer busted! #{session[:player_name]} wins! You now have $#{session[:cash]}."
@@ -172,7 +172,7 @@ get '/game/compare' do
 end
 
 post '/dealer/hit' do
-  dealer_turn_toggle
+  dealer_turn_toggle!
   session[:dealer_hand] << session[:deck].pop
   if calculate_value(session[:dealer_hand]) <= 17
     erb :game
@@ -195,13 +195,3 @@ post '/next_round' do
   end
   redirect '/bet'
 end
-
-
-
-
-
-
-
-
-
-
