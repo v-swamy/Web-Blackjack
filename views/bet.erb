@@ -1,7 +1,7 @@
 <form action='/save_bet' method='post'>
   <fieldset>
     <legend>Please enter your bet.</legend>
-    <label><%= session[:player_name] %> has $500.</label>
+    <label><%= session[:player_name] %> has $<%= session[:cash] %>.</label>
     <input type="text" placeholder="Your bet" name='bet'>
     <br/>
     <button type="submit" class="btn">Place your bet</button>

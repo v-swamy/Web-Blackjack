@@ -1,13 +1,31 @@
-<h1>Blackjack!</h1>
+<% if @show_play_again_buttons %>
+  <h4>Play again?</h4>
+  <form action="/next_round" method="post" id="yes">
+    <button type='submit' class='btn btn-primary'>Yes</button>
+  </form>
+  <form action="/game_over" method="post" id="no">
+    <button type='submit' class='btn btn-inverse'>No</button>
+  </form>
+  </br>
+  </br>
+<% end %>
 
+<h1>Blackjack!</h1>
+<p>Welcome <%= session[:player_name] %>!</p>
 <div class='well'>
   <h4>Dealer's cards:</h4>
   <% if !@dealer_turn %>
-    <img src="images/cards/cover.jpg" class='card_image'>
+    <img src="/images/cards/cover.jpg" class='card_image'>
     <%= card_image(session[:dealer_hand][1]) %>
   <% else %>
     <% session[:dealer_hand].each do |card| %>
       <%= card_image(card) %>
+    <% end %>
+    <p>Dealer has <%= calculate_value(session[:dealer_hand]) %> points.</p>
+    <% if @show_dealer_hit_button %>
+      <form action="/dealer/hit" method="post">
+        <button type='submit' class='btn btn-primary'> Click to see the dealer's next card <i class="icon-arrow-right"></i></button>
+      </form>
     <% end %>
   <% end %>
 </div>
@@ -15,20 +33,21 @@
 <br/>
 
 <div class='well'>
-<h4>Player's cards:</h4>
+<h4><%= session[:player_name] %>'s cards:</h4>
     <% session[:player_hand].each do |card| %>
       <%= card_image(card) %>
     <% end %>
-</div>
-
 <p><%= session[:player_name] %> has <%= calculate_value(session[:player_hand]) %> points.</p>
+<p>Current bet: $<%= session[:bet] %></p>
+</div>
 
 
 <% if @show_hit_or_stay_buttons %>
-  <form  action="/hit" method="post" id="hit">
-    <button type='button' class='btn btn-success'>Hit</button>
+  <p>What would you like to do?</p>
+  <form action="/player/hit" method="post" id="hit">
+    <button type='submit' class='btn btn-success'>Hit</button>
   </form>
-  <form  action="/stay" method="post" id="stay">
-    <button type='button' class='btn btn-warning'>Stay</button>
+  <form action="/dealer" method="post" id="stay">
+    <button type='submit' class='btn btn-warning'>Stay</button>
   </form>
 <% end %>
