@@ -42,7 +42,7 @@ helpers do
 
   def card_image(card)
     suit = card.split.last.downcase
-    value = CARD_VALUES[card.split.first.to_s]
+    value = CARD_VALUES[card.split.first].to_s
     if ['Jack', 'Queen', 'King', 'Ace'].include?(card.split.first)
       value = card.split.first.downcase
     end
