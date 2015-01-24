@@ -95,6 +95,7 @@ get '/bet' do
   if session[:cash] == 0
     @error = "#{session[:player_name]} is out of cash! Click <a href='/'>Start Over</a> to play again."
   end
+  session[:bet] = nil
   erb :bet
 end
 
@@ -105,7 +106,7 @@ post '/save_bet' do
   elsif /\D/.match(params[:bet])
     @error = "Please enter numbers only!"
     halt erb :bet
-  elsif params[:bet].empty?
+  elsif params[:bet].empty? || params[:bet].to_i == 0
     @error = "Please enter your bet to proceed!"
     halt erb :bet
   end
@@ -136,14 +137,14 @@ post '/player/hit' do
   session[:player_hand] << session[:deck].pop
   if calculate_value(session[:player_hand]) > 21
     session[:cash] -= session[:bet]
-    @error = "#{session[:player_name]} busted! You now have $#{session[:cash]}."
+    @loser = "#{session[:player_name]} busted! You now have $#{session[:cash]}."
     game_over_button_toggle!
     if session[:cash] == 0
-      @error = "#{session[:player_name]} busted and is out of cash! Click <a href='/'>Start Over</a> to play again."
+      @loser = "#{session[:player_name]} busted and is out of cash! Click <a href='/'>Start Over</a> to play again."
       @show_play_again_buttons = false
     end
   end
-  erb :game
+  erb :game, layout: false
 end
 
 post '/dealer' do
@@ -151,31 +152,31 @@ post '/dealer' do
   if calculate_value(session[:dealer_hand]) > 17
     redirect '/game/compare'
   end
-  erb :game
+  erb :game, layout: false
 end
 
 get '/game/compare' do
   game_over_button_toggle!
   if calculate_value(session[:dealer_hand]) > 21
     session[:cash] += session[:bet]
-    @success = "Dealer busted! #{session[:player_name]} wins! You now have $#{session[:cash]}."
+    @winner = "Dealer busted! #{session[:player_name]} wins! You now have $#{session[:cash]}."
   elsif calculate_value(session[:player_hand]) > calculate_value(session[:dealer_hand])
     session[:cash] += session[:bet]
-    @success = "#{session[:player_name]} wins! You now have $#{session[:cash]}."
+    @winner = "#{session[:player_name]} wins! You now have $#{session[:cash]}."
   elsif calculate_value(session[:player_hand]) < calculate_value(session[:dealer_hand])
     session[:cash] -= session[:bet]
-    @error = "Dealer wins! You now have $#{session[:cash]}."
+    @loser = "Dealer wins! You now have $#{session[:cash]}."
   else
-    @info = "It's a tie! You now have $#{session[:cash]}."
+    @tie = "It's a tie! You now have $#{session[:cash]}."
   end
-  erb :game
+  erb :game, layout: false
 end
 
 post '/dealer/hit' do
   dealer_turn_toggle!
   session[:dealer_hand] << session[:deck].pop
   if calculate_value(session[:dealer_hand]) <= 17
-    erb :game
+    erb :game, layout: false
   else
     redirect '/game/compare'
   end

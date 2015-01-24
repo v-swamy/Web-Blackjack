@@ -1,3 +1,11 @@
+<div id='game'>
+  <%if @loser %>
+    <div class="alert alert-error"><%=@loser%></div>
+  <%elsif @winner %>
+    <div class="alert alert-success"><%=@winner%></div>
+  <%elsif @tie %>
+    <div class="alert alert-info"><%=@tie%></div>
+  <% end %>
 <% if @show_play_again_buttons %>
   <h4>Play again?</h4>
   <form action="/next_round" method="post" id="yes">
@@ -12,7 +20,7 @@
 
 <h1>Blackjack!</h1>
 <p>Welcome <%= session[:player_name] %>!</p>
-<div class='well'>
+<div class='well' id='dealer_area'>
   <h4>Dealer's cards:</h4>
   <% if !@dealer_turn %>
     <img src="/images/cards/cover.jpg" class='card_image'>
@@ -32,7 +40,7 @@
 
 <br/>
 
-<div class='well'>
+<div class='well' id='player_area'>
 <h4><%= session[:player_name] %>'s cards:</h4>
     <% session[:player_hand].each do |card| %>
       <%= card_image(card) %>
@@ -51,3 +59,4 @@
     <button type='submit' class='btn btn-warning'>Stay</button>
   </form>
 <% end %>
+</div>
